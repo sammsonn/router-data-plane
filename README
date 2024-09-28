@@ -1,0 +1,51 @@
+PCOM - Tema 1
+Samson Alexandru-Valentin
+322CC
+
+Subcerinte rezolvate:
+    -Procesul de dirijare
+    -Longest Prefix Match eficient
+    -Protocolul ICMP
+
+Procesul de dirijare:
+    -Am luat IP-ul interfetei si l-am transformat in intreg pentru a-l compara
+    cu IP-ul destinatie al pachetului primit
+    -Daca sunt egale, trimit inapoi ICMP-ul corespunzator, daca nu, verific
+    integritatea checksum-ului
+    -Daca checksum-ul este corect, verific daca pachetul are campul TTL mai mic
+    sau egal cu 1, caz in care trimit inapoi un ICMP Time Exceeded.
+    -Daca TTL-ul este mai mare, scad TTL-ul cu 1 si caut cea mai buna cale din
+    tabela de rutare
+    -Daca nu gasesc nicio cale, trimit inapoi un ICMP Destination Unreachable
+    -Daca gasesc o cale, recalculez checksum-ul si iau MAC-ul destinatie din
+    tabela ARP pe care il pun in pachet
+    -Actualizez host-ul sursa si trimit pachetul mai departe pe calea gasita
+
+Longest Prefix Match eficient:
+    -Am sortat tabela de rutare descrescator dupa prefix si apoi dupa masca
+    -Am cautat in aceasta tabela folosind cautarea binara astfel
+    -Calculez indicele elementului din mijlocul vectorului si verific daca
+    prefixul curent se potriveste cu adresa IP de destinatie (fac asta prin
+    aplicarea mastii la adresa IP de destinatie si compararea cu prefixul)
+    -Daca prefixul se potriveste, actualizez cea mai buna potrivire de pana
+    acum si continui cautarea in partea stanga a vectorului pentru a gasi o
+    potrivire cu un prefix mai lung
+    -Daca nu se potriveste si prefixul este mai mare decat adresa IP de
+    destinatie, continui cautarea in partea stanga a vectorului
+    -Daca nu se potriveste si prefixul este mai mic decat adresa IP de
+    destinatie, continui cautarea in partea dreapta a vectorului
+    -In final returnez cea mai buna potrivire gasita sau NULL daca nu exista
+
+Protocolul ICMP:
+    -Pentru ICMP Echo Reply, construiesc un pachet nou cu header ICMP cu
+    aceleasi valori ca pachetul primit, dar cu tipul ICMP schimbat si cu
+    checksum-ul recalculat si il trimit inapoi la sursa
+    -Pentru ICMP Time Exceeded, construiesc un pachet nou cu header ICMP de
+    tipul 11 si cu checksum-ul recalculat, iar dupa aceea adaug
+    header-ul IPv4 al pachetului primit si primii 8 octeti din payload pentru a
+    trimite inapoi la sursa pachetul care a generat eroarea
+    -Pentru ICMP Destination Unreachable, construiesc un pachet nou cu header
+    ICMP de tipul 3 si cu checksum-ul recalculat, iar dupa aceea adaug
+    header-ul IPv4 al pachetului primit si primii 8 octeti din payload pentru a
+    trimite inapoi la sursa pachetul care a generat eroarea
+    
